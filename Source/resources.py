@@ -10,7 +10,7 @@ def reload(filename=None) -> None:
     global config, role_givers, channel_info
 
     if filename == "config" or filename is None:
-        with open("config.json") as config_file:
+        with open("Resources/config.json") as config_file:
             config = json.load(config_file)
 
 
