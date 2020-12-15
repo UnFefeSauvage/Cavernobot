@@ -10,10 +10,12 @@ def clamp(n, start, end):
     return n
 
 
+#*Main generator function
 def create_meta():
     return "Alors tu " + basic_move() + into() + random_move() + random_end() * clamp(pif.randint(0, 1), 0, 1)
 
 
+#*random move pickers
 def random_move():
     move = moves[pif.randint(0, len(moves)-1)]
     return move()
@@ -24,6 +26,8 @@ def basic_move():
     return move()
 
 
+
+#*random item pickers
 def random_character():
     return characters[pif.randint(0, len(characters)-1)]
 
@@ -41,17 +45,25 @@ def random_end():
     return endings[pif.randint(0, len(endings) - 1)]
 
 
+#*basic moves
+def ctrl_key():
+    n = pif.randint(0, 3)
+    return "%sctrl-%s " % (random_modifier(), action_keys[n])
+
+def rush():
+    return "%srush %s " % (random_modifier(), random_place())
+
+def key():
+    n = pif.randint(0,3)
+    return random_modifier() + action_keys[n]
+
+#*composed moves
 def into():
     return "into %s " % (basic_move())
 
 
 def combo():
     return "%scombo %s " % (random_modifier(), basic_move())
-
-
-def ctrl_key():
-    n = pif.randint(0, 3)
-    return "%sctrl-%s " % (random_modifier(), action_keys[n])
 
 
 def dash():
@@ -62,16 +74,13 @@ def counter():
     return "%scounter %sde %s " % (random_modifier(), basic_move(), random_character())
 
 
-def rush():
-    return "%srush %s " % (random_modifier(), random_place())
-
 
 places = ["tower", "toplane", "botlane", "midlane", "bush", "jungle"]
 action_keys = ['Q', 'W', 'E', 'R']
 characters = ["Garren", "Jinx", "Teemo", "Ash"]
 modifiers = ["", "double", "turbo", "speed", "triple"]
 endings = ["Alt-F4", "ggwp"]
-basic_moves = [ctrl_key, dash, rush]
+basic_moves = [ctrl_key, dash, rush, key]
 moves = [ctrl_key, into, combo, dash, counter, rush]
 
 
