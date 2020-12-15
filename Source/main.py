@@ -144,4 +144,6 @@ async def crewlink(ctx):
     else:
         await ctx.send("Tu n'es pas sur le serveur Among Us. (Ou on m'a codé comme un pied")
 
-bot.run(resources.config["token"])
+
+if __name__ == "__main__":
+    bot.run(resources.config["token"])
