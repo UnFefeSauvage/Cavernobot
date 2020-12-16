@@ -142,7 +142,7 @@ async def crewlink(ctx):
         await toggle_role(ctx.author,server_roles["AmongUs"]["CrewLink"])
         await ctx.send("Toggled role: CrewLink")
     else:
-        await ctx.send("Tu n'es pas sur le serveur Among Us. (Ou on m'a codé comme un pied")
+        await ctx.send("Cette commande ne fonctionne que sur le serveur AmongUs! (")
 
 
 if __name__ == "__main__":
