@@ -40,7 +40,7 @@ ravaged_regexes = [
     r"o+u+k",
     r"o+u+h",
     r"🗿",
-    r"monkey",
+    r"monkey|monki",
     r"ouga",
     r"bouga",
     r"🦍",
@@ -65,10 +65,6 @@ compiled_ravaged_regexes = []
 
 @bot.event
 async def on_ready():
-    print("Compiling regexes...")
-    for regex in ravaged_regexes:
-        print("compiling " + regex)
-        compiled_ravaged_regexes.append(re.compile(regex, flags=re.IGNORECASE))
     print("Ready to go!")
 
 
@@ -117,11 +113,13 @@ async def clear_permissions(ctx):
 @bot.command()
 async def ravagerie(ctx):
     ravaged_score = 0
-    async for msg in ctx.channel.history(limit=500):
+    alert_msg = await ctx.send("Processing messages...")
+    async for msg in ctx.channel.history(limit=501):
         for regex in compiled_ravaged_regexes:
             if re.search(regex, msg.content):
                 ravaged_score += 1
     ravaged_score *= 1
+    await alert_msg.delete()
     await ctx.send("Ce channel est ravagé à " + str(ravaged_score) + "%")
 
 @bot.command()
