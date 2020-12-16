@@ -57,7 +57,7 @@ ravaged_regexes = [
     r"bouillave",
     r"tennis",
     r"ravag*",
-    r"G.{2,6}G"
+    r"G.{2,6}G",
     r"/.{2,6}\\"
 ]
 
