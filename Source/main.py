@@ -45,7 +45,7 @@ ravaged_regexes = [
     r"bouga",
     r"🦍",
     r"🐒",
-    r"(piou)|(pew)",
+    r"piou|pew",
     r"🤙",
     r"🥰",
     r"(HA){2}",
