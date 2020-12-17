@@ -1,3 +1,4 @@
+import discord
 def has_role(member, roleid):
     for role in member.roles:
         if role.id == roleid:
