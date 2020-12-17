@@ -65,6 +65,10 @@ compiled_ravaged_regexes = []
 
 @bot.event
 async def on_ready():
+    print("Compiling regexes...")
+    for regex in ravaged_regexes:
+        compiled_ravaged_regexes.append(re.compile(regex))
+    print("Done!")
     print("Ready to go!")
 
 
@@ -115,6 +119,7 @@ async def ravagerie(ctx):
     ravaged_score = 0
     alert_msg = await ctx.send("Processing messages...")
     async for msg in ctx.channel.history(limit=501):
+        print(msg.content)
         for regex in compiled_ravaged_regexes:
             if re.search(regex, msg.content):
                 ravaged_score += 1
