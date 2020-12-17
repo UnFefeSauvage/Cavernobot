@@ -74,48 +74,62 @@ async def on_ready():
 
 @bot.command()
 async def list_unused_roles(ctx):
-    guild = discord.utils.find(lambda guild: guild.id == 343694718879924235, bot.guilds)
-    message = "> Unused roles:\n"
-    for role in guild.roles:
-        if not (role.id in protected_roles):
-            number_of_members = 0
-            for member in guild.members:
-                if role in member.roles:
-                    number_of_members += 1
-            if number_of_members == 0:
-                message += "**" + str(role) + "**" + "\n"
-                unused_roles.append(role)
-    await ctx.send(message)
+    """ Liste tous les rôles non utilisés ET non essentiels de la Caverne """
+    if ctx.guild.id == server_ids["Caverne"]:
+        guild = ctx.guild
+        message = "> Unused roles:\n"
+        for role in guild.roles:
+            if not (role.id in protected_roles):
+                number_of_members = 0
+                for member in guild.members:
+                    if role in member.roles:
+                        number_of_members += 1
+                if number_of_members == 0:
+                    message += "**" + str(role) + "**" + "\n"
+                    unused_roles.append(role)
+        await ctx.send(message)
+    else:
+        await ctx.send("Cette commande n'est utilisable que sur la Caverne!")
 
 
 @bot.command()
 async def delete_unused_roles(ctx):
+    """ Supprime les derniers rôles listés par "list_unused_roles" """
     global unused_roles
-    message = "This will delete the following roles:\n"
-    for role in unused_roles:
-        message += "**" + str(role) + "**" + "\n"
-    await ctx.send(message)
+    if ctx.guild.id == server_ids["Caverne"]:
+        message = "This will delete the following roles:\n"
+        for role in unused_roles:
+            message += "**" + str(role) + "**" + "\n"
+        await ctx.send(message)
 
-    for role in unused_roles:
-        await role.delete()
-    unused_roles = []
-    await ctx.send("Roles deleted!")
+        for role in unused_roles:
+            await role.delete()
+        unused_roles = []
+        await ctx.send("Roles deleted!")
+    else:
+        await ctx.send("Cette commande n'est utilisable que sur la Caverne!")
 
 
 @bot.command()
 async def clear_permissions(ctx):
-    guild = discord.utils.find(lambda guild: guild.id == 343694718879924235, bot.guilds)
-    for role in guild.roles:
-        if not (role.id in protected_roles):
-            if role.permissions.value != 0:
-                await role.edit(permissions=discord.Permissions.none(), reason="Suppression des droits inutiles")
-                await ctx.send("Cleared permissions of **" + str(role) + "**")
+    """ Enlève les droits inutiles des rôles sur la Caverne """
+    if ctx.guild.id == server_ids["Caverne"]:
+        guild = ctx.guild
+        for role in guild.roles:
+            if not (role.id in protected_roles):
+                if role.permissions.value != 0:
+                    await role.edit(permissions=discord.Permissions.none(), reason="Suppression des droits inutiles")
+                    await ctx.send("Cleared permissions of **" + str(role) + "**")
 
-    await ctx.send("Done!")
+        await ctx.send("Done!")
+    else:
+        await ctx.send("Cette commande n'est utilisable que sur la Caverne!")
+
 
 
 @bot.command()
 async def ravagerie(ctx):
+    """Évalue pour vous le niveau de ravagerie d'un salon de discussion, vous évitant ainsi une ravagerie surprise!"""
     ravaged_score = 0
     alert_msg = await ctx.send("Processing messages...")
     async for msg in ctx.channel.history(limit=501):
@@ -128,18 +142,22 @@ async def ravagerie(ctx):
 
 @bot.command()
 async def ban(ctx):
+    """Bobo senpai..."""
     await ctx.send("https://cdn.discordapp.com/attachments/459632261508235264/744966051187392562/image0.jpg")
 
 @bot.command()
 async def fight(ctx):
+    """Stéphane Burnes wants to know your location"""
     await ctx.send("https://cdn.discordapp.com/attachments/435380743598899201/486932499650314241/image0.png")
 
 @bot.command()
 async def lol(ctx):
+    """Des pépites de sagesse pour up votre ranking dans la ligue des légendes"""
     await ctx.send(metalol.create_meta())
 
 @bot.command()
 async def crewlink(ctx):
+    """Vous donne le rôle CrewLink (Serveur AmongUs uniquement)"""
     if ctx.channel.guild.id == server_ids["AmongUs"]:
         await toggle_role(ctx.author,server_roles["AmongUs"]["CrewLink"])
         await ctx.send("Toggled role: CrewLink")
