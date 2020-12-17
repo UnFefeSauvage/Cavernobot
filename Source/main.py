@@ -119,7 +119,6 @@ async def ravagerie(ctx):
     ravaged_score = 0
     alert_msg = await ctx.send("Processing messages...")
     async for msg in ctx.channel.history(limit=501):
-        print(msg.content)
         for regex in compiled_ravaged_regexes:
             if re.search(regex, msg.content):
                 ravaged_score += 1
