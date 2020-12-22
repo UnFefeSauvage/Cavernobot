@@ -37,8 +37,7 @@ unused_roles = []
 ravaged_regexes = [
     r"ouais? ?gros?",
     r"oo+k",
-    r"o+u+k",
-    r"o+u+h",
+    r"o+u+[kh]",
     r"🗿",
     r"monkey|monki",
     r"ouga",
