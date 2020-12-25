@@ -71,6 +71,18 @@ async def on_ready():
     print("Done!")
     print("Ready to go!")
 
+@bot.event
+async def on_message(msg: discord.Message):
+    if (not msg.author.bot) and (msg.guild.id == server_ids["Caverne"]):
+        print(resources.counts)
+        counted = resources.counts.keys()
+        for word in counted:
+            if word in msg.content:
+                resources.counts[word] += 1
+        
+        resources.write("counts")
+
+    await bot.process_commands(msg)
 
 @bot.command()
 async def list_unused_roles(ctx):
@@ -163,6 +175,17 @@ async def crewlink(ctx):
         await ctx.send("Toggled role: CrewLink")
     else:
         await ctx.send("Cette commande ne fonctionne que sur le serveur AmongUs! (")
+
+@bot.command()
+async def count(ctx: commands.Context, arg):
+    if ctx.guild.id == server_ids["Caverne"]:
+        resources.reload("counts")
+        if arg in resources.counts.keys():
+            await ctx.send(f"\"{arg}\" a été dit {resources.counts[arg]} fois sur la Caverne")
+        else:
+            resources.counts[arg] = 0
+            resources.write("counts")
+            await ctx.send(f"Les \"{arg}\" sont désormais comptés!")
 
 
 if __name__ == "__main__":
