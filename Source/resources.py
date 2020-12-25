@@ -1,28 +1,43 @@
 import json
+import threading
 
 config = {}
-role_givers = {}
-channel_info = {}
+counts = {}
 
+locks = {
+    "config": threading.Lock(),
+    "counts": threading.Lock()
+}
 
 def reload(filename=None) -> None:
     '''Reloads the specified file. Reloads all files if None is given'''
-    global config, role_givers, channel_info
+    global counts, config
 
     if filename == "config" or filename is None:
-        with open("Resources/config.json") as config_file:
-            config = json.load(config_file)
-
+        with locks["config"]:
+            with open("Resources/config.json", "r") as config_file:
+                config = json.load(config_file)
+    
+    if filename == "counts" or filename is None:
+        with locks["counts"]:
+            with open("Resources/counts.json", "r") as data_file:
+                counts = json.load(data_file)
 
 def write(filename: str) -> None:
     '''A function to write out the modified data'''
 
     if filename == "config":
-        with open("Resources/config.json", "w") as outfile:
-            json.dump(config, outfile)
+        with locks["config"]:
+            with open("Resources/config.json", "w") as outfile:
+                json.dump(config, outfile)
 
+    elif filename == "counts":
+        with locks["counts"]:
+            with open("Resources/counts.json", "w") as outfile:
+                json.dump(counts, outfile)
+        
     else:
         raise ValueError("Expected a configuration file")
 
 
-reload()
+reload(None)
