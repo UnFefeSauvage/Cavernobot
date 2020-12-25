@@ -2,4 +2,5 @@
 venv
 .vscode
 config.json
+counts.json
 __pycache__
