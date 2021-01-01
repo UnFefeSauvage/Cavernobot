@@ -1,13 +1,18 @@
-from discord.ext import commands
-from custom_utilities import *
 import discord
-import json
-import resources
-import re
+from discord.ext import commands
+import DiscordUtils
+
 from time import sleep
+import json
+import re
+
+from custom_utilities import *
+import resources
 import metalol
 
 bot = commands.Bot(command_prefix=resources.config["prefix"])
+
+music = DiscordUtils.Music()
 
 protected_roles = [567478735356297226,  # Meilleur admin de tous les temps
                    572564528173285376,  # Pour que le bot puisse travailler
@@ -19,6 +24,7 @@ protected_roles = [567478735356297226,  # Meilleur admin de tous les temps
                    638860564830879764,  # Mantaro
                    736863922111381556,  # Bienvenue
                    343694718879924235]  # Everyone
+
 
 server_ids = {
     "Caverne": 343694718879924235,
@@ -180,12 +186,95 @@ async def crewlink(ctx):
 async def count(ctx: commands.Context, arg):
     if ctx.guild.id == server_ids["Caverne"]:
         resources.reload("counts")
+        #TODO print a list of counted expressions if no argument is given
         if arg in resources.counts.keys():
             await ctx.send(f"\"{arg}\" a été dit {resources.counts[arg]} fois sur la Caverne")
         else:
             resources.counts[arg] = 0
             resources.write("counts")
             await ctx.send(f"Les \"{arg}\" sont désormais comptés!")
+
+@bot.command(aliases=['connecter'])
+async def join(ctx):
+    await ctx.author.voice.channel.connect() #Joins author's voice channel
+
+@bot.command(aliases=['fuckoff', 'zou', 'tagueule', 'tg'])
+async def leave(ctx):
+    await ctx.voice_client.disconnect()
+
+@bot.command(aliases=['p', 'joue', 'jouer'])
+async def play(ctx, *, url):
+    # Si aucun argument n'est fourni, 'play' signifie 'reprendre'    
+    if not url:
+        resume(ctx)
+        return
+
+    player = music.get_player(guild_id=ctx.guild.id)
+    if not player:
+        player = music.create_player(ctx, ffmpeg_error_betterfix=True)
+    if not ctx.voice_client.is_playing():
+        await player.queue(url, search=True)
+        song = await player.play()
+        await ctx.send(f"En train de jouer: {song.name}")
+    else:
+        song = await player.queue(url, search=True)
+        await ctx.send(f"Ajouté à la queue: {song.name}")
+    
+@bot.command()
+async def pause(ctx):
+    player = music.get_player(guild_id=ctx.guild.id)
+    song = await player.pause()
+    await ctx.send("Musique mise en pause!")
+
+@bot.command(aliases=['reprendre'])
+async def resume(ctx):
+    player = music.get_player(guild_id=ctx.guild.id)
+    song = await player.resume()
+    await ctx.send(f"On reprend {song.name}")
+
+@bot.command()
+async def stop(ctx):
+    player = music.get_player(guild_id=ctx.guild.id)
+    await player.stop()
+    await ctx.send("Yeet")
+
+@bot.command()
+async def loop(ctx):
+    player = music.get_player(guild_id=ctx.guild.id)
+    song = await player.toggle_song_loop()
+    if song.is_looping:
+        await ctx.send("Bienvenue à Minas Morghul, la cité des morts!")
+    else:
+        await ctx.send("Bravo! Vous êtes sorti de votre boucle temporelle!")
+
+@bot.command(aliases=['q'])
+async def queue(ctx):
+    player = music.get_player(guild_id=ctx.guild.id)
+    await ctx.send('\n'.join([f"{i}. {song.name}" for i, song in enumerate(player.current_queue())]))
+
+@bot.command(aliases=['np'])
+async def now_playing(ctx):
+    player = music.get_player(guild_id=ctx.guild.id)
+    song = player.now_playing()
+    await ctx.send(f"En train de jouer {song.name}")
+
+@bot.command(aliases=['s'])
+async def skip(ctx):
+    player = music.get_player(guild_id=ctx.guild.id)
+    data = await player.skip(force=True)
+    await ctx.send(f"\"{data[0].name}\" a été yeet.")
+
+@bot.command(aliases=['v'])
+async def volume(ctx, vol):
+    player = music.get_player(guild_id=ctx.guild.id)
+    song, volume = await player.change_volume(float(int(vol) / 100)) # volume should be a float between 0 to 1
+    await ctx.send(f"Volume à {volume*100}% capitaine!")
+
+@bot.command(aliases=['gerte','r'])
+async def remove(ctx, index):
+    player = music.get_player(guild_id=ctx.guild.id)
+    song = await player.remove_from_queue(int(index))
+    await ctx.send(f"Removed {song.name} from queue")
 
 
 if __name__ == "__main__":
