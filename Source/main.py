@@ -250,7 +250,13 @@ async def loop(ctx):
 @bot.command(aliases=['q'])
 async def queue(ctx):
     player = music.get_player(guild_id=ctx.guild.id)
-    await ctx.send('\n'.join([f"{i}. {song.name}" for i, song in enumerate(player.current_queue())]))
+    queue = player.current_queue()
+    message = f'```python\n@ EN COURS DE LECTURE: {queue[0].name}\n\n@ MUSIQUES SUIVANTES:'
+    for i in range(1,len(queue)):
+        song = queue[i]
+        message += f'\n{i}) {song.name} -- {song.duration//60}:{song.duration%60}'
+    message += '\n```'
+    await ctx.send(message)
 
 @bot.command(aliases=['np'])
 async def now_playing(ctx):
