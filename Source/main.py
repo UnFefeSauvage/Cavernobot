@@ -80,7 +80,6 @@ async def on_ready():
 @bot.event
 async def on_message(msg: discord.Message):
     if (not msg.author.bot) and (msg.guild.id == server_ids["Caverne"]):
-        print(resources.counts)
         counted = resources.counts.keys()
         for word in counted:
             if word in msg.content:
@@ -206,7 +205,7 @@ async def leave(ctx):
 async def play(ctx, *, url):
     # Si aucun argument n'est fourni, 'play' signifie 'reprendre'    
     if not url:
-        resume(ctx)
+        ctx.client.resume(ctx)
         return
 
     player = music.get_player(guild_id=ctx.guild.id)
