@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-import DiscordUtils
 
 from time import sleep
 import json
@@ -9,21 +8,9 @@ import re
 from custom_utilities import *
 import resources
 import metalol
+import cogs
 
 bot = commands.Bot(command_prefix=resources.config["prefix"])
-
-music = DiscordUtils.Music()
-
-protected_roles = [567478735356297226,  # Meilleur admin de tous les temps
-                   572564528173285376,  # Pour que le bot puisse travailler
-                   482292815166963714,  # poto
-                   569953389970980870,  # Golems
-                   524347357475897364,  # Rythm
-                   420305560835981324,  # MathBot
-                   572354706337300480,  # Mee6
-                   638860564830879764,  # Mantaro
-                   736863922111381556,  # Bienvenue
-                   343694718879924235]  # Everyone
 
 
 server_ids = {
@@ -37,8 +24,6 @@ server_roles = {
         "CrewLink": 786986614987292683
     }
 }
-
-unused_roles = []
 
 ravaged_regexes = [
     r"ouais? ?gros?",
@@ -88,60 +73,6 @@ async def on_message(msg: discord.Message):
         resources.write("counts")
 
     await bot.process_commands(msg)
-
-@bot.command()
-async def list_unused_roles(ctx):
-    """ Liste tous les rôles non utilisés ET non essentiels de la Caverne """
-    if ctx.guild.id == server_ids["Caverne"]:
-        guild = ctx.guild
-        message = "> Unused roles:\n"
-        for role in guild.roles:
-            if not (role.id in protected_roles):
-                number_of_members = 0
-                for member in guild.members:
-                    if role in member.roles:
-                        number_of_members += 1
-                if number_of_members == 0:
-                    message += "**" + str(role) + "**" + "\n"
-                    unused_roles.append(role)
-        await ctx.send(message)
-    else:
-        await ctx.send("Cette commande n'est utilisable que sur la Caverne!")
-
-
-@bot.command()
-async def delete_unused_roles(ctx):
-    """ Supprime les derniers rôles listés par "list_unused_roles" """
-    global unused_roles
-    if ctx.guild.id == server_ids["Caverne"]:
-        message = "This will delete the following roles:\n"
-        for role in unused_roles:
-            message += "**" + str(role) + "**" + "\n"
-        await ctx.send(message)
-
-        for role in unused_roles:
-            await role.delete()
-        unused_roles = []
-        await ctx.send("Roles deleted!")
-    else:
-        await ctx.send("Cette commande n'est utilisable que sur la Caverne!")
-
-
-@bot.command()
-async def clear_permissions(ctx):
-    """ Enlève les droits inutiles des rôles sur la Caverne """
-    if ctx.guild.id == server_ids["Caverne"]:
-        guild = ctx.guild
-        for role in guild.roles:
-            if not (role.id in protected_roles):
-                if role.permissions.value != 0:
-                    await role.edit(permissions=discord.Permissions.none(), reason="Suppression des droits inutiles")
-                    await ctx.send("Cleared permissions of **" + str(role) + "**")
-
-        await ctx.send("Done!")
-    else:
-        await ctx.send("Cette commande n'est utilisable que sur la Caverne!")
-
 
 
 @bot.command()
@@ -193,94 +124,7 @@ async def count(ctx: commands.Context, arg):
             resources.write("counts")
             await ctx.send(f"Les \"{arg}\" sont désormais comptés!")
 
-@bot.command(aliases=['connecter'])
-async def join(ctx):
-    await ctx.author.voice.channel.connect() #Joins author's voice channel
-
-@bot.command(aliases=['fuckoff', 'zou', 'tagueule', 'tg'])
-async def leave(ctx):
-    await ctx.voice_client.disconnect()
-
-@bot.command(aliases=['p', 'joue', 'jouer'])
-async def play(ctx, *, url):
-    # Si aucun argument n'est fourni, 'play' signifie 'reprendre'    
-    if not url:
-        ctx.client.resume(ctx)
-        return
-
-    player = music.get_player(guild_id=ctx.guild.id)
-    if not player:
-        player = music.create_player(ctx, ffmpeg_error_betterfix=True)
-    if not ctx.voice_client.is_playing():
-        await player.queue(url, search=True)
-        song = await player.play()
-        await ctx.send(f"En train de jouer: {song.name}")
-    else:
-        song = await player.queue(url, search=True)
-        await ctx.send(f"Ajouté à la queue: {song.name}")
-    
-@bot.command()
-async def pause(ctx):
-    player = music.get_player(guild_id=ctx.guild.id)
-    song = await player.pause()
-    await ctx.send("Musique mise en pause!")
-
-@bot.command(aliases=['reprendre'])
-async def resume(ctx):
-    player = music.get_player(guild_id=ctx.guild.id)
-    song = await player.resume()
-    await ctx.send(f"On reprend {song.name}")
-
-@bot.command()
-async def stop(ctx):
-    player = music.get_player(guild_id=ctx.guild.id)
-    await player.stop()
-    await ctx.send("Yeet")
-
-@bot.command()
-async def loop(ctx):
-    player = music.get_player(guild_id=ctx.guild.id)
-    song = await player.toggle_song_loop()
-    if song.is_looping:
-        await ctx.send("Bienvenue à Minas Morghul, la cité des morts!")
-    else:
-        await ctx.send("Bravo! Vous êtes sorti de votre boucle temporelle!")
-
-@bot.command(aliases=['q'])
-async def queue(ctx):
-    player = music.get_player(guild_id=ctx.guild.id)
-    queue = player.current_queue()
-    message = f'```python\n@ EN COURS DE LECTURE: {queue[0].name}\n\n@ MUSIQUES SUIVANTES:'
-    for i in range(1,len(queue)):
-        song = queue[i]
-        message += f'\n{i}) {song.name} -- {song.duration//60}:{song.duration%60}'
-    message += '\n```'
-    await ctx.send(message)
-
-@bot.command(aliases=['np'])
-async def now_playing(ctx):
-    player = music.get_player(guild_id=ctx.guild.id)
-    song = player.now_playing()
-    await ctx.send(f"En train de jouer {song.name}")
-
-@bot.command(aliases=['s'])
-async def skip(ctx):
-    player = music.get_player(guild_id=ctx.guild.id)
-    data = await player.skip(force=True)
-    await ctx.send(f"\"{data[0].name}\" a été yeet.")
-
-@bot.command(aliases=['v'])
-async def volume(ctx, vol):
-    player = music.get_player(guild_id=ctx.guild.id)
-    song, volume = await player.change_volume(float(int(vol) / 100)) # volume should be a float between 0 to 1
-    await ctx.send(f"Volume à {volume*100}% capitaine!")
-
-@bot.command(aliases=['gerte','r'])
-async def remove(ctx, index):
-    player = music.get_player(guild_id=ctx.guild.id)
-    song = await player.remove_from_queue(int(index))
-    await ctx.send(f"Removed {song.name} from queue")
-
-
 if __name__ == "__main__":
+    bot.add_cog(cogs.Jukebox(bot))
+    bot.add_cog(cogs.Caverne(bot))
     bot.run(resources.config["token"])
