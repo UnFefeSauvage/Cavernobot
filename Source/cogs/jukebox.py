@@ -101,6 +101,8 @@ class Jukebox(commands.Cog):
     async def skip(self, ctx):
         """Passes à la musique suivante"""
         player = self.jukebox.get_player(guild_id=ctx.guild.id)
+        if player is None:
+            raise music.NotPlaying("Cannot skip because nothing is being played!")
         data = await player.skip(force=True)
         await ctx.send(f"\"{data[0].name}\" a été yeet. Passage à la musique suivante.")
 
