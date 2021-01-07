@@ -1,6 +1,10 @@
 import discord
 from discord.ext import commands
 
+class DeactivatedCommand(Exception):
+    """This command has been deactivated"""
+    pass
+
 class Caverne(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -15,9 +19,13 @@ class Caverne(commands.Cog):
                                 638860564830879764,  # Mantaro
                                 736863922111381556,  # Bienvenue
                                 343694718879924235]  # Everyone
-        self.list_unused_roles = []
+        self.unused_roles = []
+        self.deactivated_commands = [self.list_unused_roles, self.delete_unused_roles]
 
-    def cog_check(self, ctx):
+    async def cog_check(self, ctx):
+        if ctx.command in self.deactivated_commands:
+            await ctx.send("Désolé, cette commande a été désactivée le temps de la débugger :(")
+            raise DeactivatedCommand()
         return ctx.guild.id == self.guild_id
     
     async def cog_command_error(self, ctx, error):
@@ -25,35 +33,36 @@ class Caverne(commands.Cog):
             await ctx.send("Cette commande n'est utilisable que sur la Caverne, mon serveur de naissance...")
         else:
             await ctx.send("Une erreur imprévue est survenue... Si vous tapez mon créateur assez fort ça devrait bientôt remarcher!")
+            raise error
 
     @commands.command()
     async def list_unused_roles(self, ctx):
         """ Liste tous les rôles non utilisés ET non essentiels de la Caverne """
         guild = ctx.guild
+        self.unused_roles = []
         message = "> Unused roles:\n"
         for role in guild.roles:
             if not (role.id in self.protected_roles):
-                unused = True
+                number_of_members = 0
                 for member in guild.members:
                     if role in member.roles:
-                        unused = False
-                        break
-                if unused:
+                        number_of_members += 1
+                if number_of_members == 0:
                     message += "**" + str(role) + "**" + "\n"
-                    unused_roles.append(role)
+                    self.unused_roles.append(role)
         await ctx.send(message)
 
     @commands.command()
     async def delete_unused_roles(self, ctx):
         """ Supprime les derniers rôles listés par "list_unused_roles" """
         message = "Suppression des rôles:\n"
-        for role in unused_roles:
+        for role in self.unused_roles:
             message += "**" + str(role) + "**" + "\n"
         await ctx.send(message)
 
-        for role in unused_roles:
+        for role in self.unused_roles:
             await role.delete()
-        unused_roles = []
+        self.unused_roles = []
         await ctx.send("Rôles supprimés!")
 
     @commands.command()
