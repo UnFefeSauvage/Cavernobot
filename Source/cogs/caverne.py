@@ -23,7 +23,7 @@ class Caverne(commands.Cog):
         self.deactivated_commands = [self.list_unused_roles, self.delete_unused_roles]
 
     async def cog_check(self, ctx):
-        if ctx.command in self.deactivated_commands:
+        if ctx.command in self.deactivated_commands and ctx.message.content != f'{self.bot.command_prefix}help':
             await ctx.send("Désolé, cette commande a été désactivée le temps de la débugger :(")
             raise DeactivatedCommand()
         return ctx.guild.id == self.guild_id
@@ -37,7 +37,7 @@ class Caverne(commands.Cog):
 
     @commands.command()
     async def list_unused_roles(self, ctx):
-        """ Liste tous les rôles non utilisés ET non essentiels de la Caverne """
+        """Liste tous les rôles non utilisés ET non essentiels"""
         guild = ctx.guild
         self.unused_roles = []
         message = "> Unused roles:\n"
@@ -54,7 +54,7 @@ class Caverne(commands.Cog):
 
     @commands.command()
     async def delete_unused_roles(self, ctx):
-        """ Supprime les derniers rôles listés par "list_unused_roles" """
+        """Supprime les derniers rôles listés par "list_unused_roles\""""
         message = "Suppression des rôles:\n"
         for role in self.unused_roles:
             message += "**" + str(role) + "**" + "\n"
@@ -67,7 +67,7 @@ class Caverne(commands.Cog):
 
     @commands.command()
     async def clear_permissions(self, ctx):
-        """Enlève les droits inutiles des rôles sur la Caverne"""
+        """Enlève les droits inutiles des rôles décoatifs"""
         await ctx.send("Début du nettoyage...")
         guild = ctx.guild
         cleaned_roles = 0
