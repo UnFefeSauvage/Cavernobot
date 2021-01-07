@@ -8,13 +8,13 @@ class Jukebox(commands.Cog):
     
     async def cog_command_error(self, ctx, error):
         if isinstance(error, music.NotPlaying):
-            ctx.send("Aucune musique n'est en train d'être jouée!")
+            await ctx.send("Aucune musique n'est en train d'être jouée!")
         elif isinstance(error, music.EmptyQueue):
-            ctx.send("La queue est vide!")
+            await ctx.send("La queue est vide!")
         elif isinstance(error, music.NotConnectedToVoice):
-            ctx.send("Je ne suis pas dans un canal vocal! Connectes moi avec `=join` avant de lancer une musique!")
+            await ctx.send("Je ne suis pas dans un canal vocal! Connectes moi avec `=join` avant de lancer une musique!")
         else:
-            ctx.send("Désolé, une erreur inconnue est survenue dans le module Jukebox :(")
+            await ctx.send("Désolé, une erreur inconnue est survenue dans le module Jukebox :(")
             raise error
 
     @commands.command(aliases=['connect'])
