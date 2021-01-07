@@ -71,7 +71,7 @@ class Jukebox(commands.Cog):
         message = f'```python\n@ EN COURS DE LECTURE: {queue[0].name}\n\n@ MUSIQUES SUIVANTES:'
         for i in range(1,len(queue)):
             song = queue[i]
-            message += f'\n{i}) {song.name} -- {song.duration//60}:{song.duration%60}'
+            message += f'\n{i}) {song.name} -- {int(song.duration//60)}:{int(song.duration%60)}'
         message += '\n```'
         await ctx.send(message)
 
