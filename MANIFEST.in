@@ -1,0 +1,4 @@
+include Source/metalol
+include Source/resources
+include Source/custom_utilities
+include Source/cogs/*.py
