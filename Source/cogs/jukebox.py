@@ -43,7 +43,9 @@ class Jukebox(commands.Cog):
         """Joues ou ajoutes une musique à la queue"""
         player = self.jukebox.get_player(guild_id=ctx.guild.id)
 
+
         if not player:
+            ctx.invoke(self.join,ctx)
             player = self.jukebox.create_player(ctx, ffmpeg_error_betterfix=True)
 
         if not ctx.voice_client.is_playing():

@@ -23,7 +23,7 @@ class Caverne(commands.Cog):
         self.deactivated_commands = [self.list_unused_roles, self.delete_unused_roles]
 
     async def cog_check(self, ctx):
-        if ctx.command in self.deactivated_commands and ctx.message.content != f'{self.bot.command_prefix}help':
+        if ctx.command in self.deactivated_commands and ctx.message.content[:5] != f'{self.bot.command_prefix}help':
             await ctx.send("Désolé, cette commande a été désactivée le temps de la débugger :(")
             raise DeactivatedCommand()
         return ctx.guild.id == self.guild_id
