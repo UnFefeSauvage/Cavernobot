@@ -1,6 +1,5 @@
 from discord.ext import commands
-import DiscordUtils.Music as music
-
+import DiscordUtils.music as music
 
 class Jukebox(commands.Cog):
     def __init__(self, bot):
