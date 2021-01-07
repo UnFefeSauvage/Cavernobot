@@ -7,6 +7,9 @@ class Jukebox(commands.Cog):
         self.jukebox = music.Music()
     
     async def cog_command_error(self, ctx, error):
+        if isinstance(error, commands.CommandInvokeError):
+            error = error.original
+        
         if isinstance(error, music.NotPlaying):
             await ctx.send("Aucune musique n'est en train d'être jouée!")
         elif isinstance(error, music.EmptyQueue):
