@@ -1,6 +1,9 @@
 from discord.ext import commands
 import DiscordUtils.music as music
 
+class JukeboxError(Exception):
+    """Something went wrong with the Jukebox and we know what"""
+
 class Jukebox(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -10,8 +13,10 @@ class Jukebox(commands.Cog):
         if isinstance(error, commands.CommandInvokeError):
             error = error.original
         
-        if isinstance(error, music.NotPlaying):
-            await ctx.send("Aucune musique n'est en train d'être jouée!")
+        if isinstance(error, JukeboxError):
+            await ctx.send(str(error))
+        elif isinstance(error, music.NotPlaying):
+            await ctx.send("Je ne suis pas en train de jouer de la musique!")
         elif isinstance(error, music.EmptyQueue):
             await ctx.send("La queue est vide!")
         elif isinstance(error, music.NotConnectedToVoice):
@@ -23,7 +28,10 @@ class Jukebox(commands.Cog):
     @commands.command(aliases=['connect'])
     async def join(self, ctx):
         """Envoie le Cavernobot dans ton canal vocal"""
-        await ctx.author.voice.channel.connect() #Joins author's voice channel
+        try:
+            await ctx.author.voice.channel.connect() #Joins author's voice channel
+        except AttributeError:
+            raise JukeboxError("Tu dois être dans un canal vocal pour m'y connecter!")
 
     @commands.command(aliases=['fuckoff', 'zou', 'tagueule', 'tg'])
     async def leave(self, ctx):
@@ -51,6 +59,8 @@ class Jukebox(commands.Cog):
     async def pause(self, ctx):
         """Mets la musique actuelle en pause"""
         player = self.jukebox.get_player(guild_id=ctx.guild.id)
+        if player is None:
+            raise music.NotPlaying("Je ne joue pas de musique!")
         song = await player.pause()
         await ctx.send("Musique mise en pause!")
 
@@ -58,6 +68,8 @@ class Jukebox(commands.Cog):
     async def resume(self, ctx):
         """Reprends la musique que tu écoutais"""
         player = self.jukebox.get_player(guild_id=ctx.guild.id)
+        if player is None:
+            raise music.NotPlaying("Je ne joue pas de musique!")
         song = await player.resume()
         await ctx.send(f"On reprend {song.name}")
 
@@ -65,6 +77,8 @@ class Jukebox(commands.Cog):
     async def stop(self, ctx):
         """Arrête la musique et vide la queue"""
         player = self.jukebox.get_player(guild_id=ctx.guild.id)
+        if player is None:
+            raise music.NotPlaying("Je ne joue pas de musique!")
         await player.stop()
         await ctx.send("Yeet")
 
@@ -72,6 +86,8 @@ class Jukebox(commands.Cog):
     async def loop(self, ctx):
         """Actives ou désactives le tourbillon des enfers"""
         player = music.get_player(guild_id=ctx.guild.id)
+        if player is None:
+            raise music.NotPlaying("Je ne joue pas de musique!")
         song = await player.toggle_song_loop()
         if song.is_looping:
             await ctx.send("*\"Boule qui roule tourne en rond.\" -Rémy (je crois)*")
@@ -82,6 +98,8 @@ class Jukebox(commands.Cog):
     async def queue(self, ctx):
         """Affiches la queue sur le point d'être jouée"""
         player = self.jukebox.get_player(guild_id=ctx.guild.id)
+        if player is None:
+            raise music.NotPlaying("Je ne joue pas de musique!")
         queue = player.current_queue()
         message = f'```python\n@ EN COURS DE LECTURE: {queue[0].name}\n\n@ MUSIQUES SUIVANTES:'
         for i in range(1,len(queue)):
