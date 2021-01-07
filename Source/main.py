@@ -92,7 +92,7 @@ async def ban(ctx):
     """Bobo senpai..."""
     await ctx.send("https://cdn.discordapp.com/attachments/459632261508235264/744966051187392562/image0.jpg")
 
-@bot.command()
+@bot.command(aliases=['bagar'])
 async def fight(ctx):
     """Stéphane Burnes wants to know your location"""
     await ctx.send("https://cdn.discordapp.com/attachments/435380743598899201/486932499650314241/image0.png")
@@ -109,7 +109,7 @@ async def crewlink(ctx):
         await toggle_role(ctx.author,server_roles["AmongUs"]["CrewLink"])
         await ctx.send("Toggled role: CrewLink")
     else:
-        await ctx.send("Cette commande ne fonctionne que sur le serveur AmongUs! (")
+        await ctx.send("Cette commande ne fonctionne que sur le serveur AmongUs!")
 
 @bot.command()
 async def count(ctx: commands.Context, arg):
