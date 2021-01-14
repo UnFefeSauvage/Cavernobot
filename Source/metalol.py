@@ -12,7 +12,7 @@ def clamp(n, start, end):
 
 #*Main generator function
 def create_meta():
-    return "Alors tu " + basic_move() + into() + random_move() + random_end() * clamp(pif.randint(0, 1), 0, 1)
+    return "Alors tu " + basic_move() + into() + random_move() + random_end() * pif.randint(0, 1)
 
 
 #*random move pickers
