@@ -36,7 +36,11 @@ class Jukebox(commands.Cog):
     @commands.command(aliases=['fuckoff', 'zou', 'tagueule', 'tg'])
     async def leave(self, ctx):
         """Déconnecte le Cavernobot du canal"""
+        player = self.jukebox.get_player(guild_id=ctx.guild.id)
+        if player:
+            await player.stop()
         await ctx.voice_client.disconnect()
+        await ctx.send("Yeet")
     
     @commands.command(aliases=['p', 'joue', 'jouer'])
     async def play(self, ctx, *, url):
