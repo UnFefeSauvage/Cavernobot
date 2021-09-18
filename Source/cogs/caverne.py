@@ -19,8 +19,7 @@ class Caverne(commands.Cog):
                                 638860564830879764,  # Mantaro
                                 736863922111381556,  # Bienvenue
                                 343694718879924235]  # Everyone
-        self.unused_roles = []
-        self.deactivated_commands = [self.list_unused_roles, self.delete_unused_roles]
+        self.deactivated_commands = []
 
     async def cog_check(self, ctx):
         if ctx.command in self.deactivated_commands and ctx.message.content[:5] != f'{self.bot.command_prefix}help':
@@ -34,36 +33,6 @@ class Caverne(commands.Cog):
         else:
             await ctx.send("Une erreur imprévue est survenue... Si vous tapez mon créateur assez fort ça devrait bientôt remarcher!")
             raise error
-
-    @commands.command()
-    async def list_unused_roles(self, ctx):
-        """Liste tous les rôles non utilisés ET non essentiels"""
-        guild = ctx.guild
-        self.unused_roles = []
-        message = "> Unused roles:\n"
-        for role in guild.roles:
-            if not (role.id in self.protected_roles):
-                number_of_members = 0
-                for member in guild.members:
-                    if role in member.roles:
-                        number_of_members += 1
-                if number_of_members == 0:
-                    message += "**" + str(role) + "**" + "\n"
-                    self.unused_roles.append(role)
-        await ctx.send(message)
-
-    @commands.command()
-    async def delete_unused_roles(self, ctx):
-        """Supprime les derniers rôles listés par "list_unused_roles\""""
-        message = "Suppression des rôles:\n"
-        for role in self.unused_roles:
-            message += "**" + str(role) + "**" + "\n"
-        await ctx.send(message)
-
-        for role in self.unused_roles:
-            await role.delete()
-        self.unused_roles = []
-        await ctx.send("Rôles supprimés!")
 
     @commands.command()
     async def clear_permissions(self, ctx):
