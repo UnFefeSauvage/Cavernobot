@@ -132,7 +132,7 @@ class Jukebox(commands.Cog):
     @commands.command(aliases=['v'])
     async def volume(self, ctx, vol):
         """Changes le volume avec une valeur entre 0 et 100"""
-        vol = max(min(0,int(vol)), 300)
+        vol = min(max(0,int(vol)), 300)
         player = self.jukebox.get_player(guild_id=ctx.guild.id)
         song, volume = await player.change_volume(float(vol / 100)) # volume should be a float between 0 to 1
         await ctx.send(f"Volume à {vol}% capitaine!")
