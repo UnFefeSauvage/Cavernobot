@@ -27,7 +27,7 @@ class Jukebox(commands.Cog):
             await ctx.send("Désolé, une erreur inconnue est survenue dans le module Jukebox :(")
             raise error
 
-    @commands.command(aliases=['connect'])
+    @commands.command(aliases=['connect', 'j'])
     async def join(self, ctx):
         """Envoie le Cavernobot dans ton canal vocal"""
         try:
@@ -139,7 +139,7 @@ class Jukebox(commands.Cog):
         song, volume = await player.change_volume(float(vol / 100)) # volume should be a float between 0 to 1
         await ctx.send(f"Volume à {vol}% capitaine!")
 
-    @commands.command(aliases=['gerte','r'])
+    @commands.command(aliases=['gerte','rm'])
     async def remove(self, ctx, index):
         """Enlèves la musique d'index indiqué de la file"""
         player = self.jukebox.get_player(guild_id=ctx.guild.id)
