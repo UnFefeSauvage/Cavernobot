@@ -6,6 +6,7 @@ class DeactivatedCommand(Exception):
     pass
 
 class Caverne(commands.Cog):
+    """Commandes disponibles uniquement sur la Caverne"""
     def __init__(self, bot):
         self.bot = bot
         self.guild_id = 343694718879924235
@@ -20,6 +21,7 @@ class Caverne(commands.Cog):
                                 736863922111381556,  # Bienvenue
                                 343694718879924235]  # Everyone
         self.deactivated_commands = []
+        print("Caverne initialised!")
 
     async def cog_check(self, ctx):
         if ctx.command in self.deactivated_commands and ctx.message.content[:5] != f'{self.bot.command_prefix}help':

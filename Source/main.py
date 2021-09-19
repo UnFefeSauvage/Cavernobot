@@ -124,6 +124,10 @@ async def count(ctx: commands.Context, arg):
             await ctx.send(f"Les \"{arg}\" sont désormais comptés!")
 
 if __name__ == "__main__":
+    print("Loading cogs...")
     bot.add_cog(cogs.Jukebox(bot))
     bot.add_cog(cogs.Caverne(bot))
+    bot.add_cog(cogs.AdminCommands(bot,resources.config["administrators"]))
+    print("Cogs loaded!")
+    print("Launching bot...")
     bot.run(resources.config["token"])

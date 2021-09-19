@@ -5,9 +5,11 @@ class JukeboxError(Exception):
     """Something went wrong with the Jukebox and we know what"""
 
 class Jukebox(commands.Cog):
+    """Commandes permettant de m'utiliser comme bot musique"""
     def __init__(self, bot):
         self.bot = bot
         self.jukebox = music.Music()
+        print("Jukebox initialised!")
     
     async def cog_command_error(self, ctx, error):
         if isinstance(error, commands.CommandInvokeError):
