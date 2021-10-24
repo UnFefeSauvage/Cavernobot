@@ -11,7 +11,7 @@ class Jukebox(commands.Cog):
         self.bot = bot
         self.jukebox = music.Music()
 
-        self.yt_quicklink_re = re.compile("https://youtu\\.be/(.*)")
+        self.yt_quicklink_re = re.compile("https://(www\\.)?youtu\\.be/(.*)")
         
         print("Jukebox initialised!")
     
@@ -34,7 +34,7 @@ class Jukebox(commands.Cog):
 
     def fix_url(self, url):
         if (match := self.yt_quicklink_re.match(url)):
-            return "https://www.youtube.com/watch?v=%s" % match.group(1)
+            return "https://www.youtube.com/watch?v=%s" % match.group(2)
         
         # Si aucun url réparable n'a été reconnu, renvoyer l'url tel quel
         return url
@@ -60,6 +60,8 @@ class Jukebox(commands.Cog):
     async def play(self, ctx, *, url):
         """Joues ou ajoutes une musique à la queue"""
         player = self.jukebox.get_player(guild_id=ctx.guild.id)
+
+        url = self.fix_url(url)
 
         if not player:
             await ctx.invoke(self.join)
