@@ -34,7 +34,7 @@ class Jukebox(commands.Cog):
 
     def fix_url(self, url):
         if (match := self.yt_quicklink_re.match(url)):
-            return "https://www.youtube.com/watch?v=%s" % match.group(1)
+            return "https://www.youtube.com/watch?v=%s" % match.group(2)
         
         # Si aucun url réparable n'a été reconnu, renvoyer l'url tel quel
         return url
