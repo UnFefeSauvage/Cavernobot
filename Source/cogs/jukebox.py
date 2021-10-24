@@ -1,5 +1,6 @@
 from discord.ext import commands
 import DiscordUtils.music as music
+import re
 
 class JukeboxError(Exception):
     """Something went wrong with the Jukebox and we know what"""
@@ -9,6 +10,9 @@ class Jukebox(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.jukebox = music.Music()
+
+        self.yt_quicklink_re = re.compile("https://youtu\\.be/(.*)")
+        
         print("Jukebox initialised!")
     
     async def cog_command_error(self, ctx, error):
@@ -24,9 +28,17 @@ class Jukebox(commands.Cog):
         elif isinstance(error, music.NotConnectedToVoice):
             await ctx.send("Je ne suis pas dans un canal vocal! Connectes moi avec `=join` avant de lancer une musique!")
         else:
-            await ctx.send("Désolé, une erreur inconnue est survenue dans le module Jukebox :(")
+            await ctx.send("Désolé, une erreur inconnue est survenue dans le module Jukebox :(\nDétails:\n%s" % str(error))
             raise error
 
+
+    def fix_url(self, url):
+        if (match := self.yt_quicklink_re.match(url)):
+            return "https://www.youtube.com/watch?v=%s" % match.group(1)
+        
+        # Si aucun url réparable n'a été reconnu, renvoyer l'url tel quel
+        return url
+    
     @commands.command(aliases=['connect', 'j'])
     async def join(self, ctx):
         """Envoie le Cavernobot dans ton canal vocal"""
