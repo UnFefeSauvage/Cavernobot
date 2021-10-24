@@ -122,6 +122,8 @@ class Jukebox(commands.Cog):
         if player is None:
             raise music.NotPlaying("Je ne joue pas de musique!")
         queue = player.current_queue()
+        if len(queue) == 0:
+            raise JukeboxError("La queue est vide.")
         message = f'```python\n@ EN COURS DE LECTURE: {queue[0].name}\n\n@ MUSIQUES SUIVANTES:'
         for i in range(1,len(queue)):
             song = queue[i]
