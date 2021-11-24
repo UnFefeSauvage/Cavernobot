@@ -1,5 +1,6 @@
 from discord.ext import commands
 import DiscordUtils.music as music
+import re
 
 class JukeboxError(Exception):
     """Something went wrong with the Jukebox and we know what"""
@@ -9,6 +10,9 @@ class Jukebox(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.jukebox = music.Music()
+
+        self.yt_quicklink_re = re.compile("https://(www\\.)?youtu\\.be/(.*)")
+        
         print("Jukebox initialised!")
     
     async def cog_command_error(self, ctx, error):
@@ -24,9 +28,17 @@ class Jukebox(commands.Cog):
         elif isinstance(error, music.NotConnectedToVoice):
             await ctx.send("Je ne suis pas dans un canal vocal! Connectes moi avec `=join` avant de lancer une musique!")
         else:
-            await ctx.send("Désolé, une erreur inconnue est survenue dans le module Jukebox :(")
+            await ctx.send("Désolé, une erreur inconnue est survenue dans le module Jukebox :(\nDétails:\n%s" % str(error))
             raise error
 
+
+    def fix_url(self, url):
+        if (match := self.yt_quicklink_re.match(url)):
+            return "https://www.youtube.com/watch?v=%s" % match.group(2)
+        
+        # Si aucun url réparable n'a été reconnu, renvoyer l'url tel quel
+        return url
+    
     @commands.command(aliases=['connect', 'j'])
     async def join(self, ctx):
         """Envoie le Cavernobot dans ton canal vocal"""
@@ -48,6 +60,8 @@ class Jukebox(commands.Cog):
     async def play(self, ctx, *, url):
         """Joues ou ajoutes une musique à la queue"""
         player = self.jukebox.get_player(guild_id=ctx.guild.id)
+
+        url = self.fix_url(url)
 
         if not player:
             await ctx.invoke(self.join)
@@ -108,6 +122,8 @@ class Jukebox(commands.Cog):
         if player is None:
             raise music.NotPlaying("Je ne joue pas de musique!")
         queue = player.current_queue()
+        if len(queue) == 0:
+            raise JukeboxError("La queue est vide.")
         message = f'```python\n@ EN COURS DE LECTURE: {queue[0].name}\n\n@ MUSIQUES SUIVANTES:'
         for i in range(1,len(queue)):
             song = queue[i]
