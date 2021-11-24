@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
 
+import re
+
 class DeactivatedCommand(Exception):
     """This command has been deactivated"""
     pass
@@ -21,6 +23,7 @@ class Caverne(commands.Cog):
                                 736863922111381556,  # Bienvenue
                                 343694718879924235]  # Everyone
         self.deactivated_commands = []
+        self.regex_bn : re.Pattern[re.AnyStr@compile] = re.compile(r"[Bb]onne +nuit")
         print("Caverne initialised!")
 
     async def cog_check(self, ctx):
@@ -36,6 +39,14 @@ class Caverne(commands.Cog):
             await ctx.send("Une erreur imprévue est survenue... Si vous tapez mon créateur assez fort ça devrait bientôt remarcher!")
             raise error
 
+    @commands.Cog.listener()
+    async def on_message(self, message:discord.Message):
+        if self.regex_bn.match(message.content):
+            await message.add_reaction("❤️")
+            await message.add_reaction("💙")
+            await message.add_reaction("💚")
+            await message.add_reaction("🤍")
+            await message.add_reaction("💛")
     @commands.command()
     async def clear_permissions(self, ctx):
         """Enlève les droits inutiles des rôles décoatifs"""
