@@ -41,7 +41,10 @@ class Caverne(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
-        if self.regex_bn.match(message.content):
+        if message.guild.id != self.guild_id:
+            return
+        
+        if self.regex_bn.search(message.content):
             await message.add_reaction("❤️")
             await message.add_reaction("💙")
             await message.add_reaction("💚")
