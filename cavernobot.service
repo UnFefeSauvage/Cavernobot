@@ -8,7 +8,7 @@ Type=simple
 User=cavernobot  # Omit user/group if creating user service file
 Group=cavernobot
 WorkingDirectory=/home/cavernobot
-ExecStart=/home/cavernobot/cavernobot_daemon
+ExecStart=/home/cavernobot/cavernobot
 Restart=on-failure
 # Other restart options: always, on-abort, etc
 
