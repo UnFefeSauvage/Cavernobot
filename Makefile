@@ -2,14 +2,13 @@
 PHONY: install setup update update_dependencies
 
 install: setup
-	cp cavernobot.service /usr/lib/systemd/system/
-	systemctl enable cavernobot
+	cp cavernobot.service /usr/lib/systemd/user/
 
 setup:
 	@echo "Setting up virtual environment (location: ./venv)..."
 	@( \
 		python3 -m venv ./venv; \
-		source ./venv/bin/activate; \
+		. venv/bin/activate; \
 		pip3 install -r requirements.txt; \
 	)
 	@echo "Generating default bot data (location: ./data)..."

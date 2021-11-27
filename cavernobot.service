@@ -4,9 +4,8 @@ After=network.target
 
 [Service]
 Type=simple
-# Another Type: forking
-User=cavernobot  # Omit user/group if creating user service file
-Group=cavernobot
+User=1001
+Group=1001
 WorkingDirectory=/home/cavernobot/bot
 ExecStart=/home/cavernobot/bot/cavernobot
 Restart=on-failure
