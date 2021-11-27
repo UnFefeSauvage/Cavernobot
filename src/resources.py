@@ -15,12 +15,12 @@ def reload(filename=None) -> None:
 
     if filename == "config" or filename is None:
         with locks["config"]:
-            with open("Resources/config.json", "r") as config_file:
+            with open("data/config.json", "r") as config_file:
                 config = json.load(config_file)
     
     if filename == "counts" or filename is None:
         with locks["counts"]:
-            with open("Resources/counts.json", "r") as data_file:
+            with open("data/counts.json", "r") as data_file:
                 counts = json.load(data_file)
 
 def write(filename: str) -> None:
@@ -28,12 +28,12 @@ def write(filename: str) -> None:
 
     if filename == "config":
         with locks["config"]:
-            with open("Resources/config.json", "w") as outfile:
+            with open("data/config.json", "w") as outfile:
                 json.dump(config, outfile)
 
     elif filename == "counts":
         with locks["counts"]:
-            with open("Resources/counts.json", "w") as outfile:
+            with open("data/counts.json", "w") as outfile:
                 json.dump(counts, outfile)
         
     else:

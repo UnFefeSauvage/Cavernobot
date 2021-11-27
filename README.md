@@ -5,7 +5,7 @@ This code is here mostly for ease of deployment and transparence
 
 ## How to install
 
-Make sure you've got **at least python 3.5**
+Make sure you've got **at least python 3.5** (discord.py requirement)
 
 ### Clone the repository on your server
 
@@ -21,15 +21,15 @@ python -m venv .venv/
 ### Enter the virtual environment and install dependencies
 
 ```bash
-source ./venv/bin/activate
+src ./venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Create a `Resources/` folder in which you'll put:
+### Create a `Resrcs/` folder in which you'll put:
 
 * a `config.json` file with the `"token"` and `"prefix"` attribute
 * an empty (contains `{}`) `counts.json` file
 
 ### Launch the bot
 
-By being in the virtual environment using `python Source/main.py`
+By being in the virtual environment using `python src/main.py`
