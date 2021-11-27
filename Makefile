@@ -2,7 +2,7 @@
 PHONY: install setup update update_dependencies
 
 install: setup
-	cp cavernobot.service /usr/lib/systemd/user/
+	cp cavernobot.service /etc/systemd/system/
 
 setup:
 	@echo "Setting up virtual environment (location: ./venv)..."
