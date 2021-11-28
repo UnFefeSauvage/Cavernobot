@@ -10,12 +10,12 @@ def clamp(n, start, end):
     return n
 
 
-#*Main generator function
+# *Main generator function
 def create_meta():
     return "Alors tu " + basic_move() + into() + random_move() + random_end() * pif.randint(0, 1)
 
 
-#*random move pickers
+# *random move pickers
 def random_move():
     move = moves[pif.randint(0, len(moves)-1)]
     return move()
@@ -26,8 +26,7 @@ def basic_move():
     return move()
 
 
-
-#*random item pickers
+# *random item pickers
 def random_character():
     return characters[pif.randint(0, len(characters)-1)]
 
@@ -45,19 +44,23 @@ def random_end():
     return endings[pif.randint(0, len(endings) - 1)]
 
 
-#*basic moves
+# *basic moves
 def ctrl_key():
     n = pif.randint(0, 3)
     return "%sctrl-%s " % (random_modifier(), action_keys[n])
 
+
 def rush():
     return "%srush %s " % (random_modifier(), random_place())
 
+
 def key():
-    n = pif.randint(0,3)
+    n = pif.randint(0, 3)
     return random_modifier() + action_keys[n]
 
-#*composed moves
+# *composed moves
+
+
 def into():
     return "into %s " % (basic_move())
 
@@ -72,7 +75,6 @@ def dash():
 
 def counter():
     return "%scounter %sde %s " % (random_modifier(), basic_move(), random_character())
-
 
 
 places = ["tower", "toplane", "botlane", "midlane", "bush", "jungle"]

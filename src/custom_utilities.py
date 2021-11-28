@@ -1,10 +1,13 @@
 import discord
+
+
 def has_role(member, roleid):
     for role in member.roles:
         if role.id == roleid:
             return True
 
     return False
+
 
 async def toggle_role(member, roleid):
     role = discord.Object(roleid)

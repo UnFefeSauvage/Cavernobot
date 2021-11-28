@@ -2,23 +2,26 @@ from discord.ext import commands
 import DiscordUtils.music as music
 import re
 
+
 class JukeboxError(Exception):
     """Something went wrong with the Jukebox and we know what"""
 
+
 class Jukebox(commands.Cog):
     """Commandes permettant de m'utiliser comme bot musique"""
+
     def __init__(self, bot):
         self.bot = bot
         self.jukebox = music.Music()
 
         self.yt_quicklink_re = re.compile("https://(www\\.)?youtu\\.be/(.*)")
-        
+
         print("Jukebox initialised!")
-    
+
     async def cog_command_error(self, ctx, error):
         if isinstance(error, commands.CommandInvokeError):
             error = error.original
-        
+
         if isinstance(error, JukeboxError):
             await ctx.send(str(error))
         elif isinstance(error, music.NotPlaying):
@@ -31,21 +34,21 @@ class Jukebox(commands.Cog):
             await ctx.send("Désolé, une erreur inconnue est survenue dans le module Jukebox :(\nDétails:\n%s" % str(error))
             raise error
 
-
     def fix_url(self, url):
         if (match := self.yt_quicklink_re.match(url)):
             return "https://www.youtube.com/watch?v=%s" % match.group(2)
-        
+
         # Si aucun url réparable n'a été reconnu, renvoyer l'url tel quel
         return url
-    
+
     @commands.command(aliases=['connect', 'j'])
     async def join(self, ctx):
         """Envoie le Cavernobot dans ton canal vocal"""
         try:
-            await ctx.author.voice.channel.connect() #Joins author's voice channel
+            await ctx.author.voice.channel.connect()  # Joins author's voice channel
         except AttributeError:
-            raise JukeboxError("Tu dois être dans un canal vocal pour m'y connecter!")
+            raise JukeboxError(
+                "Tu dois être dans un canal vocal pour m'y connecter!")
 
     @commands.command(aliases=['fuckoff', 'zou', 'tagueule', 'tg'])
     async def leave(self, ctx):
@@ -55,7 +58,7 @@ class Jukebox(commands.Cog):
             await player.stop()
         await ctx.voice_client.disconnect()
         await ctx.send("Yeet")
-    
+
     @commands.command(aliases=['p', 'joue', 'jouer'])
     async def play(self, ctx, *, url):
         """Joues ou ajoutes une musique à la queue"""
@@ -65,17 +68,18 @@ class Jukebox(commands.Cog):
 
         if not player:
             await ctx.invoke(self.join)
-            player = self.jukebox.create_player(ctx, ffmpeg_error_betterfix=True)
+            player = self.jukebox.create_player(
+                ctx, ffmpeg_error_betterfix=True)
 
         if not ctx.voice_client.is_playing():
             await player.queue(url, search=True, allow_generic_file=True)
-            #TODO Resume the current song if there is one
+            # TODO Resume the current song if there is one
             song = await player.play()
             await ctx.send(f"En train de jouer: {song.name}")
         else:
             song = await player.queue(url, search=True, allow_generic_file=True)
             await ctx.send(f"Ajouté à la queue: {song.name}")
-    
+
     @commands.command()
     async def pause(self, ctx):
         """Mets la musique actuelle en pause"""
@@ -125,7 +129,7 @@ class Jukebox(commands.Cog):
         if len(queue) == 0:
             raise JukeboxError("La queue est vide.")
         message = f'```python\n@ EN COURS DE LECTURE: {queue[0].name}\n\n@ MUSIQUES SUIVANTES:'
-        for i in range(1,len(queue)):
+        for i in range(1, len(queue)):
             song = queue[i]
             message += f'\n{i}) {song.name} -- {int(song.duration//60)}:{int(song.duration%60)}'
         message += '\n```'
@@ -143,19 +147,21 @@ class Jukebox(commands.Cog):
         """Passes à la musique suivante"""
         player = self.jukebox.get_player(guild_id=ctx.guild.id)
         if player is None:
-            raise music.NotPlaying("Cannot skip because nothing is being played!")
+            raise music.NotPlaying(
+                "Cannot skip because nothing is being played!")
         data = await player.skip(force=True)
         await ctx.send(f"\"{data[0].name}\" a été yeet. Passage à la musique suivante.")
 
     @commands.command(aliases=['v'])
     async def volume(self, ctx, vol):
         """Changes le volume avec une valeur entre 0 et 100"""
-        vol = min(max(0,int(vol)), 300)
+        vol = min(max(0, int(vol)), 300)
         player = self.jukebox.get_player(guild_id=ctx.guild.id)
-        song, volume = await player.change_volume(float(vol / 100)) # volume should be a float between 0 to 1
+        # volume should be a float between 0 to 1
+        song, volume = await player.change_volume(float(vol / 100))
         await ctx.send(f"Volume à {vol}% capitaine!")
 
-    @commands.command(aliases=['gerte','rm'])
+    @commands.command(aliases=['gerte', 'rm'])
     async def remove(self, ctx, index):
         """Enlèves la musique d'index indiqué de la file"""
         player = self.jukebox.get_player(guild_id=ctx.guild.id)

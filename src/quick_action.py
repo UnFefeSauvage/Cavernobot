@@ -17,11 +17,14 @@ server_ids = {
 channel_ids = {
     "nouvel-an": 763379872465813504
 }
+
+
 @bot.event
 async def on_ready():
     print("Connected!")
-    #* ACTIONS A EFFECTUER
-    caverne = discord.utils.find(lambda guild: guild.id == server_ids["Caverne"], bot.guilds)
+    # * ACTIONS A EFFECTUER
+    caverne = discord.utils.find(
+        lambda guild: guild.id == server_ids["Caverne"], bot.guilds)
 
 
 bot.run(resources.config["token"])
